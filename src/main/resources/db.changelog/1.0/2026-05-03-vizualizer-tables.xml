@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Отвечает за хранение истории поиска молекул в визуализаторе и симуляторе -->
+    <changeSet id="2026-05-03-create-search-history-table" author="kondrahin">
+        <createTable tableName="search_history">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="query" type="varchar(255)"/>
+            <column name="history_type" type="varchar(20)" defaultValue="visualizer">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="search_history"
+                baseColumnNames="user_id"
+                referencedTableName="users"
+                referencedColumnNames="id"
+                constraintName="fk_search_history_user_id"
+                onDelete="CASCADE"/>
+
+        <createIndex tableName="search_history" indexName="idx_search_history_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="search_history" indexName="idx_search_history_type">
+            <column name="history_type"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Отвечает за хранение химических элементов -->
+    <changeSet id="2026-05-03-create-periodic-table" author="kondrahin">
+        <createTable tableName="periodic_table">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="symbol" type="varchar(10)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valence" type="integer"/>
+            <column name="color" type="varchar(20)"/>
+            <column name="radius" type="integer"/>
+            <column name="group_number" type="integer"/>
+            <column name="period" type="integer"/>
+        </createTable>
+
+        <createIndex tableName="periodic_table" indexName="idx_periodic_table_symbol">
+            <column name="symbol"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Отвечает за хранение типов химических связей: одинарные, двойные, тройные, ароматические -->
+    <changeSet id="2026-05-03-create-bond-types-table" author="kondrahin">
+        <createTable tableName="bond_types">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="label" type="varchar(50)"/>
+            <column name="value" type="integer"/>
+            <column name="color" type="varchar(20)"/>
+            <column name="style" type="varchar(50)"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Минимальные данные -->
+    <changeSet id="2026-05-03-insert-periodic-table-data" author="kondrahin">
+        <insert tableName="periodic_table">
+            <column name="symbol" value="H"/>
+            <column name="name" value="Hydrogen"/>
+            <column name="valence" value="1"/>
+            <column name="color" value="#FFFFFF"/>
+            <column name="radius" value="120"/>
+            <column name="group_number" value="1"/>
+            <column name="period" value="1"/>
+        </insert>
+
+        <insert tableName="periodic_table">
+            <column name="symbol" value="C"/>
+            <column name="name" value="Carbon"/>
+            <column name="valence" value="4"/>
+            <column name="color" value="#909090"/>
+            <column name="radius" value="170"/>
+            <column name="group_number" value="14"/>
+            <column name="period" value="2"/>
+        </insert>
+
+        <insert tableName="periodic_table">
+            <column name="symbol" value="O"/>
+            <column name="name" value="Oxygen"/>
+            <column name="valence" value="2"/>
+            <column name="color" value="#FF0D0D"/>
+            <column name="radius" value="152"/>
+            <column name="group_number" value="16"/>
+            <column name="period" value="2"/>
+        </insert>
+
+        <insert tableName="periodic_table">
+            <column name="symbol" value="N"/>
+            <column name="name" value="Nitrogen"/>
+            <column name="valence" value="3"/>
+            <column name="color" value="#3050F8"/>
+            <column name="radius" value="155"/>
+            <column name="group_number" value="15"/>
+            <column name="period" value="2"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="2026-05-03-insert-bond-types-data" author="kondrahin">
+        <insert tableName="bond_types">
+            <column name="label" value="Single"/>
+            <column name="value" value="1"/>
+            <column name="color" value="#000000"/>
+            <column name="style" value="solid"/>
+        </insert>
+
+        <insert tableName="bond_types">
+            <column name="label" value="Double"/>
+            <column name="value" value="2"/>
+            <column name="color" value="#000000"/>
+            <column name="style" value="double"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

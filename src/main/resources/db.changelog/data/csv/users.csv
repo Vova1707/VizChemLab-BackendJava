@@ -1,0 +1,5 @@
+username,email,hashed_password,is_admin
+admin,admin@vizchemlab.com,$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFDYZt/I5/BFnhkSLsVBDSC,true
+student,student@vizchemlab.com,$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFDYZt/I5/BFnhkSLsVBDSC,false
+professor,professor@vizchemlab.com,$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFDYZt/I5/BFnhkSLsVBDSC,false
+researcher,researcher@vizchemlab.com,$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iYqiSfFDYZt/I5/BFnhkSLsVBDSC,false

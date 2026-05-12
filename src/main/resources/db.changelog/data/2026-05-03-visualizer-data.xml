@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="2026-05-03-insert-extended-periodic-table" author="kondrahin">
+        <loadData
+            file="db.changelog/data/csv/periodic_table_extended.csv"
+            tableName="periodic_table"
+            separator=","
+            quotchar="&quot;">
+            <column name="symbol" type="string"/>
+            <column name="name" type="string"/>
+            <column name="valence" type="numeric"/>
+            <column name="color" type="string"/>
+            <column name="radius" type="numeric"/>
+            <column name="group_number" type="numeric"/>
+            <column name="period" type="numeric"/>
+        </loadData>
+    </changeSet>
+    
+    <!-- Insert extended bond types from CSV -->
+    <changeSet id="2026-05-03-insert-extended-bond-types" author="kondrahin">
+        <loadData
+            file="db.changelog/data/csv/bond_types_extended.csv"
+            tableName="bond_types"
+            separator=","
+            quotchar="&quot;">
+            <column name="label" type="string"/>
+            <column name="value" type="numeric"/>
+            <column name="color" type="string"/>
+            <column name="style" type="string"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

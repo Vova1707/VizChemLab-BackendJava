@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Отвечает за хранение пользователей: логин, email, хеш пароля, роль администратора -->
+    <changeSet id="2026-05-03-create-users-table" author="kondrahin">
+        <createTable tableName="users">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="hashed_password" type="varchar(255)"/>
+            <column name="is_admin" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex tableName="users" indexName="idx_users_username">
+            <column name="username"/>
+        </createIndex>
+
+        <createIndex tableName="users" indexName="idx_users_email">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2026-05-03-create-authority-table" author="kondrahin">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="authority"/>
+            </not>
+        </preConditions>
+        <createTable tableName="authority">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="authority" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="2026-02-02--0004-user-authority" author="kondrahin">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="user_authorities"/>
+            </not>
+        </preConditions>
+        <createTable
+                tableName="person_authorities">
+        <column name="id" type="BIGINT" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="user_id" type="BIGINT">
+            <constraints nullable="false" foreignKeyName="fk_usersnauth_person" referencedTableName="users"
+                         referencedColumnNames="id"/>
+        </column>
+        <column name="authorities_id" type="BIGINT">
+        <constraints nullable="false" foreignKeyName="fk_usersauth_authority" referencedTableName="authority"
+        referencedColumnNames="id"/>
+        </column>
+        </createTable>
+        </changeSet>
+
+</databaseChangeLog>
