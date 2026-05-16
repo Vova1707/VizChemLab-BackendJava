@@ -15,4 +15,6 @@ public interface UserService {
 
     UserDTO getUserByEmail(String email);
     UserDTO loginByEmail(String email, String password);
+
+    UserDTO getCurrentUser(String authorization);
 }

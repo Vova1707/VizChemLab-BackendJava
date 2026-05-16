@@ -3,13 +3,11 @@ package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.LoginEmailRequest;
-import org.example.dto.LoginResponseDto;
 import org.example.dto.UserDTO;
 import org.example.dto.UserRegisterDTO;
 import org.example.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,16 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test(){
-        return ResponseEntity.ok("Backend is working!");
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getPersonById(@PathVariable Long id){
-        return ResponseEntity.ok(userService.getUserById(id));
-    }
-    
     @PostMapping("/register")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserRegisterDTO dto){
         try {
@@ -49,11 +37,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     
-    @GetMapping("/login")
-    public ResponseEntity<UserDTO> login(Authentication authentication){
-        return ResponseEntity.ok(userService.getUserByUsername(authentication.getName()));
-    }
-
     @PostMapping("/login-email")
     public ResponseEntity<UserDTO> loginByEmail(@RequestBody LoginEmailRequest request){
         try {
@@ -64,18 +47,10 @@ public class UserController {
         }
     }
 
-    @GetMapping("/username/{username}")
-    public ResponseEntity<String> getByName(@PathVariable String username){
-        UserDTO userDTO = userService.getUserByUsername(username);
-        return ResponseEntity.ok("User" + userDTO.getUsername() + "is register");
-    }
-
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser(){
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername("testuser");
-        userDTO.setEmail("test@test.com");
-        userDTO.setIsAdmin(false);
-        return ResponseEntity.ok(userDTO);
+    public ResponseEntity<UserDTO> getCurrentUser(
+            @RequestHeader(value = "Authorization", required = false) String authorization
+    ) {
+        return ResponseEntity.ok(userService.getCurrentUser(authorization));
     }
 }

@@ -10,6 +10,7 @@ import org.example.exception.UserNotFoundException;
 import org.example.repository.AuthorityRepository;
 import org.example.repository.UserRepository;
 import org.example.service.UserService;
+import org.example.util.AuthTokenParser;
 import org.example.util.UserMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -116,5 +117,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDTO getCurrentUser(String authorization) {
+        Long userId = AuthTokenParser.parseUserId(authorization);
+        if (userId != null) {
+            return getUserById(userId);
+        }
+        String username = AuthTokenParser.parseBasicUsername(authorization);
+        if (username != null) {
+            return getUserByUsername(username);
+        }
+        throw new UserNotFoundException("Authorization required");
     }
 }

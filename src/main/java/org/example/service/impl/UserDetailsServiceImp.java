@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-/**
- * @author [Your Name]
- */
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImp implements UserDetailsService {
