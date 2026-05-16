@@ -49,12 +49,22 @@ public class VisualizerService {
             }
         }
 
-        String fallback = pubChemService.createFallbackSdf(compound);
-        if (fallback != null) {
-            return new VisualizeResponse(compound, "Fallback", "sdf", fallback, null, null);
+        boolean hasCyrillic = compound.chars().anyMatch(ch ->
+            (ch >= 'а' && ch <= 'я') || (ch >= 'А' && ch <= 'Я') || ch == 'ё' || ch == 'Ё');
+        if (hasCyrillic) {
+            String translated = pubChemService.forceTranslateToEn(compound);
+            if (translated != null && !translated.isBlank()) {
+                for (String recordType : List.of("2d", "3d")) {
+                    String sdf = pubChemService.fetchSdfByName(translated, recordType);
+                    if (sdf != null) {
+                        Long cid = pubChemService.fetchCidByName(translated);
+                        return new VisualizeResponse(compound, "PubChem (translated: " + translated + ")", "sdf", sdf, cid, null);
+                    }
+                }
+            }
         }
 
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Compound not found");
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Compound not found in PubChem database");
     }
 
     public VisualizeResponse visualizeByCid(long cid) {
