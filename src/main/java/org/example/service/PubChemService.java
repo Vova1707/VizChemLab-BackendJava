@@ -7,6 +7,9 @@ import org.example.dto.CompoundInfoDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -21,11 +24,42 @@ import java.util.regex.Pattern;
 public class PubChemService {
 
     private static final String PUBCHEM_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound";
-    private static final String MYMEMORY_URL = "https://api.mymemory.translated.net/get";
+    private static final String GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single";
     private static final Pattern FORMULA_PATTERN = Pattern.compile("^[A-Za-z0-9]+$");
 
     private final RestClient restClient = RestClient.create();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private String translateWithGoogle(String text) {
+        try {
+            String response = restClient.get()
+                .uri(GOOGLE_TRANSLATE_URL, builder -> builder
+                    .queryParam("client", "gtx")
+                    .queryParam("sl", "ru")
+                    .queryParam("tl", "en")
+                    .queryParam("dt", "t")
+                    .queryParam("q", text)
+                    .build())
+                .retrieve()
+                .body(String.class);
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode firstBlock = root.get(0);
+            if (firstBlock != null && firstBlock.isArray()) {
+                StringBuilder sb = new StringBuilder();
+                for (JsonNode segment : firstBlock) {
+                    if (segment.isArray() && segment.size() > 0) {
+                        String part = segment.get(0).asText("");
+                        if (!part.isBlank()) sb.append(part);
+                    }
+                }
+                String result = sb.toString().trim();
+                if (!result.isBlank()) return result;
+            }
+        } catch (Exception e) {
+            System.err.println("Google Translate failed for '" + text + "': " + e.getMessage());
+        }
+        return null;
+    }
 
     public String maybeTranslateToEn(String text) {
         if (text == null || text.isBlank()) {
@@ -36,22 +70,10 @@ public class PubChemService {
         if (!hasCyrillic) {
             return null;
         }
-        try {
-            String response = restClient.get()
-                .uri(MYMEMORY_URL, builder -> builder
-                    .queryParam("q", text)
-                    .queryParam("langpair", "ru|en")
-                    .build())
-                .retrieve()
-                .body(String.class);
-            JsonNode root = objectMapper.readTree(response);
-            String translated = root.path("responseData").path("translatedText").asText(null);
-            if (translated != null && !translated.isBlank()) {
-                System.out.println("Translated '" + text + "' to '" + translated + "'");
-                return translated;
-            }
-        } catch (Exception e) {
-            System.err.println("Translation failed for '" + text + "': " + e.getMessage());
+        String translated = translateWithGoogle(text);
+        if (translated != null) {
+            System.out.println("Translated '" + text + "' to '" + translated + "'");
+            return translated;
         }
         return null;
     }
@@ -60,53 +82,54 @@ public class PubChemService {
         if (text == null || text.isBlank()) {
             return null;
         }
-        try {
-            String response = restClient.get()
-                .uri(MYMEMORY_URL, builder -> builder
-                    .queryParam("q", text)
-                    .queryParam("langpair", "ru|en")
-                    .build())
-                .retrieve()
-                .body(String.class);
-            JsonNode root = objectMapper.readTree(response);
-            String translated = root.path("responseData").path("translatedText").asText(null);
-            if (translated != null && !translated.isBlank()) {
-                System.out.println("Force translated '" + text + "' to '" + translated + "'");
-                return translated;
-            }
-        } catch (Exception e) {
-            System.err.println("Force translation failed for '" + text + "': " + e.getMessage());
+        String translated = translateWithGoogle(text);
+        if (translated != null) {
+            System.out.println("Force translated '" + text + "' to '" + translated + "'");
+            return translated;
         }
         return null;
     }
 
     public String fetchSdfByName(String query, String recordType) {
-        try {
-            String url = PUBCHEM_BASE + "/name/" + encode(query) + "/SDF?record_type=" + recordType;
-            String body = restClient.get().uri(url).retrieve().body(String.class);
-            return isValidSdf(body) ? body : null;
-        } catch (Exception e) {
-            return null;
-        }
+        String url = PUBCHEM_BASE + "/name/" + encode(query) + "/SDF?record_type=" + recordType;
+        String body = httpGet(url);
+        return isValidSdf(body) ? body : null;
     }
 
     public String fetchSdfByCid(long cid, String recordType) {
-        try {
-            String url = PUBCHEM_BASE + "/cid/" + cid + "/SDF?record_type=" + recordType;
-            String body = restClient.get().uri(url).retrieve().body(String.class);
-            return isValidSdf(body) ? body : null;
-        } catch (Exception e) {
-            return null;
-        }
+        String url = PUBCHEM_BASE + "/cid/" + cid + "/SDF?record_type=" + recordType;
+        String body = httpGet(url);
+        return isValidSdf(body) ? body : null;
     }
 
     public Long fetchCidByName(String name) {
         try {
             String url = PUBCHEM_BASE + "/name/" + encode(name) + "/cids/JSON";
-            JsonNode root = objectMapper.readTree(restClient.get().uri(url).retrieve().body(String.class));
+            String body = httpGet(url);
+            if (body == null) return null;
+            JsonNode root = objectMapper.readTree(body);
             JsonNode cids = root.path("IdentifierList").path("CID");
             if (cids.isArray() && !cids.isEmpty()) {
                 return cids.get(0).asLong();
+            }
+        } catch (Exception e) {
+            System.err.println("[PubChem] fetchCidByName error: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public Long fetchCidByAutocomplete(String query) {
+        try {
+            String url = "https://pubchem.ncbi.nlm.nih.gov/rest/autocomplete/compound/" + encode(query) + "/JSON?limit=1";
+            String resp = httpGet(url);
+            if (resp == null) return null;
+            JsonNode root = objectMapper.readTree(resp);
+            JsonNode items = root.path("dictionary_terms").path("compound");
+            if (items.isArray() && !items.isEmpty()) {
+                String bestMatch = items.get(0).asText();
+                if (bestMatch != null && !bestMatch.isBlank()) {
+                    return fetchCidByName(bestMatch);
+                }
             }
         } catch (Exception ignored) {
         }
@@ -117,14 +140,14 @@ public class PubChemService {
         List<Long> result = new ArrayList<>();
         try {
             String fastUrl = PUBCHEM_BASE + "/fastformula/" + encode(formula) + "/cids/JSON?MaxRecords=25";
-            JsonNode root = objectMapper.readTree(restClient.get().uri(fastUrl).retrieve().body(String.class));
-            addCids(root, result);
+            String fastBody = httpGet(fastUrl);
+            if (fastBody != null) addCids(objectMapper.readTree(fastBody), result);
             if (!result.isEmpty()) {
                 return result;
             }
             String formulaUrl = PUBCHEM_BASE + "/formula/" + encode(formula) + "/cids/JSON?MaxRecords=25";
-            root = objectMapper.readTree(restClient.get().uri(formulaUrl).retrieve().body(String.class));
-            addCids(root, result);
+            String formulaBody = httpGet(formulaUrl);
+            if (formulaBody != null) addCids(objectMapper.readTree(formulaBody), result);
         } catch (Exception ignored) {
         }
         return result;
@@ -141,7 +164,9 @@ public class PubChemService {
         try {
             String url = PUBCHEM_BASE + "/cid/" + cidList
                     + "/property/IUPACName,MolecularFormula,MolecularWeight/JSON";
-            JsonNode root = objectMapper.readTree(restClient.get().uri(url).retrieve().body(String.class));
+            String body = httpGet(url);
+            if (body == null) return results;
+            JsonNode root = objectMapper.readTree(body);
             for (JsonNode prop : root.path("PropertyTable").path("Properties")) {
                 long cid = prop.path("CID").asLong();
                 processed.add(cid);
@@ -187,6 +212,21 @@ public class PubChemService {
     }
 
     private String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+        return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
+    }
+
+    private String httpGet(String urlStr) {
+        try {
+            HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(10000);
+            int code = conn.getResponseCode();
+            InputStream is = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
+            if (is == null) return null;
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

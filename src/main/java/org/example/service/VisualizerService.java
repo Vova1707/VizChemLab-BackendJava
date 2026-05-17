@@ -24,12 +24,25 @@ public class VisualizerService {
         }
 
         List<String> candidates = buildCandidates(compound);
+        System.out.println("[VIZ] candidates: " + candidates);
         for (String candidate : candidates) {
             for (String recordType : List.of("2d", "3d")) {
                 String sdf = pubChemService.fetchSdfByName(candidate, recordType);
+                System.out.println("[VIZ] fetchSdfByName('" + candidate + "', " + recordType + ") = " + (sdf != null ? "OK" : "null"));
                 if (sdf != null) {
                     Long cid = pubChemService.fetchCidByName(candidate);
                     return new VisualizeResponse(compound, "PubChem", "sdf", sdf, cid, null);
+                }
+            }
+            Long cid = pubChemService.fetchCidByName(candidate);
+            System.out.println("[VIZ] fetchCidByName('" + candidate + "') = " + cid);
+            if (cid != null) {
+                for (String recordType : List.of("3d", "2d")) {
+                    String sdf = pubChemService.fetchSdfByCid(cid, recordType);
+                    System.out.println("[VIZ] fetchSdfByCid(" + cid + ", " + recordType + ") = " + (sdf != null ? "OK" : "null"));
+                    if (sdf != null) {
+                        return new VisualizeResponse(compound, "PubChem", "sdf", sdf, cid, null);
+                    }
                 }
             }
         }
@@ -61,6 +74,39 @@ public class VisualizerService {
                         return new VisualizeResponse(compound, "PubChem (translated: " + translated + ")", "sdf", sdf, cid, null);
                     }
                 }
+                Long cid = pubChemService.fetchCidByName(translated);
+                if (cid != null) {
+                    for (String recordType : List.of("3d", "2d")) {
+                        String sdf = pubChemService.fetchSdfByCid(cid, recordType);
+                        if (sdf != null) {
+                            return new VisualizeResponse(compound, "PubChem (translated: " + translated + ")", "sdf", sdf, cid, null);
+                        }
+                    }
+                }
+            }
+        }
+
+        Long cidFallback = pubChemService.fetchCidByName(compound);
+        if (cidFallback != null) {
+            for (String recordType : List.of("3d", "2d")) {
+                String sdf = pubChemService.fetchSdfByCid(cidFallback, recordType);
+                if (sdf != null) {
+                    return new VisualizeResponse(compound, "PubChem", "sdf", sdf, cidFallback, null);
+                }
+            }
+        }
+
+        List<String> autocompleteQueries = new ArrayList<>(candidates);
+        autocompleteQueries.add(compound);
+        for (String query : autocompleteQueries) {
+            Long cid = pubChemService.fetchCidByAutocomplete(query);
+            if (cid != null) {
+                for (String recordType : List.of("3d", "2d")) {
+                    String sdf = pubChemService.fetchSdfByCid(cid, recordType);
+                    if (sdf != null) {
+                        return new VisualizeResponse(compound, "PubChem", "sdf", sdf, cid, null);
+                    }
+                }
             }
         }
 
@@ -83,17 +129,32 @@ public class VisualizerService {
         String translated = pubChemService.maybeTranslateToEn(compound);
         if (translated != null && !translated.isBlank()) {
             candidates.add(translated);
+            String americanized = toAmericanSpelling(translated);
+            if (!americanized.equals(translated)) {
+                candidates.add(americanized);
+            }
             if (translated.contains("g")) {
-                candidates.add(translated.replace('g', 'h'));
+                String variant = translated.replace('g', 'h');
+                candidates.add(variant);
+                candidates.add(toAmericanSpelling(variant));
             }
             if (translated.contains("ll")) {
-                candidates.add(translated.replace("ll", "l"));
-            }
-            if (translated.contains("g") && translated.contains("ll")) {
-                candidates.add(translated.replace('g', 'h').replace("ll", "l"));
+                String variant = translated.replace("ll", "l");
+                candidates.add(variant);
+                candidates.add(toAmericanSpelling(variant));
             }
         }
         candidates.add(compound);
         return new ArrayList<>(candidates);
+    }
+
+    private String toAmericanSpelling(String text) {
+        return text
+            .replace("sulph", "sulf")
+            .replace("Sulph", "Sulf")
+            .replace("aluminium", "aluminum")
+            .replace("Aluminium", "Aluminum")
+            .replace("centre", "center")
+            .replace("colour", "color");
     }
 }
