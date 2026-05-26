@@ -11,10 +11,10 @@ spring:
     change-log: classpath:db.changelog/db.changelog-master.xml
 
   jpa:
-    generate-ddl: true
+    generate-ddl: false
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: none
+    show-sql: false
 
 logging:
   level:
