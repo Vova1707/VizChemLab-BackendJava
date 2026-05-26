@@ -2,9 +2,11 @@ package org.example.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.dto.ErrorResponse;
 import org.example.dto.LoginEmailRequest;
 import org.example.dto.UserDTO;
 import org.example.dto.UserRegisterDTO;
+import org.example.exception.UserAlreadyExistsException;
 import org.example.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +19,14 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserRegisterDTO dto){
+    public ResponseEntity<?> createUser(@RequestBody UserRegisterDTO dto){
         try {
             UserDTO result = userService.createUser(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Internal server error"));
         }
     }
     

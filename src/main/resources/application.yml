@@ -7,13 +7,13 @@ spring:
       enabled: true
 
   liquibase:
-    enabled: false
+    enabled: true
     change-log: classpath:db.changelog/db.changelog-master.xml
 
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
 
 logging:

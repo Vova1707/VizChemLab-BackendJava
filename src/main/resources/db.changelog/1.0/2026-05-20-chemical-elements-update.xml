@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Добавляем недостающие колонки в таблицу periodic_table -->
+    <changeSet id="2026-05-20-add-periodic-table-columns" author="kondrahin">
+        <addColumn tableName="periodic_table">
+            <column name="name_ru" type="varchar(100)"/>
+        </addColumn>
+        <addColumn tableName="periodic_table">
+            <column name="atomic_number" type="integer"/>
+        </addColumn>
+        <addColumn tableName="periodic_table">
+            <column name="atomic_mass" type="decimal(10,4)"/>
+        </addColumn>
+        <addColumn tableName="periodic_table">
+            <column name="radius_angstrom" type="decimal(6,3)"/>
+        </addColumn>
+        <addColumn tableName="periodic_table">
+            <column name="category" type="varchar(50)"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- Обновляем существующие 4 элемента, добавляем полные данные -->
+    <changeSet id="2026-05-20-update-existing-elements" author="kondrahin">
+        <update tableName="periodic_table">
+            <column name="name_ru" value="Водород"/>
+            <column name="atomic_number" valueNumeric="1"/>
+            <column name="atomic_mass" valueNumeric="1.008"/>
+            <column name="radius_angstrom" valueNumeric="0.37"/>
+            <column name="category" value="nonmetal"/>
+            <where>symbol = 'H'</where>
+        </update>
+        <update tableName="periodic_table">
+            <column name="name_ru" value="Углерод"/>
+            <column name="atomic_number" valueNumeric="6"/>
+            <column name="atomic_mass" valueNumeric="12.011"/>
+            <column name="radius_angstrom" valueNumeric="0.77"/>
+            <column name="category" value="nonmetal"/>
+            <where>symbol = 'C'</where>
+        </update>
+        <update tableName="periodic_table">
+            <column name="name_ru" value="Кислород"/>
+            <column name="atomic_number" valueNumeric="8"/>
+            <column name="atomic_mass" valueNumeric="15.999"/>
+            <column name="radius_angstrom" valueNumeric="0.73"/>
+            <column name="category" value="nonmetal"/>
+            <where>symbol = 'O'</where>
+        </update>
+        <update tableName="periodic_table">
+            <column name="name_ru" value="Азот"/>
+            <column name="atomic_number" valueNumeric="7"/>
+            <column name="atomic_mass" valueNumeric="14.007"/>
+            <column name="radius_angstrom" valueNumeric="0.75"/>
+            <column name="category" value="nonmetal"/>
+            <where>symbol = 'N'</where>
+        </update>
+    </changeSet>
+
+    <!-- Добавляем остальные важные элементы -->
+    <changeSet id="2026-05-20-insert-remaining-elements" author="kondrahin">
+        <insert tableName="periodic_table">
+            <column name="symbol" value="He"/>
+            <column name="name" value="Helium"/>
+            <column name="name_ru" value="Гелий"/>
+            <column name="atomic_number" valueNumeric="2"/>
+            <column name="atomic_mass" valueNumeric="4.003"/>
+            <column name="color" value="#D9FFFF"/>
+            <column name="radius" valueNumeric="140"/>
+            <column name="radius_angstrom" valueNumeric="0.32"/>
+            <column name="group_number" valueNumeric="18"/>
+            <column name="period" valueNumeric="1"/>
+            <column name="category" value="noble_gas"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Li"/>
+            <column name="name" value="Lithium"/>
+            <column name="name_ru" value="Литий"/>
+            <column name="atomic_number" valueNumeric="3"/>
+            <column name="atomic_mass" valueNumeric="6.941"/>
+            <column name="color" value="#CC80FF"/>
+            <column name="radius" valueNumeric="182"/>
+            <column name="radius_angstrom" valueNumeric="1.34"/>
+            <column name="group_number" valueNumeric="1"/>
+            <column name="period" valueNumeric="2"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="alkali_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Be"/>
+            <column name="name" value="Beryllium"/>
+            <column name="name_ru" value="Бериллий"/>
+            <column name="atomic_number" valueNumeric="4"/>
+            <column name="atomic_mass" valueNumeric="9.012"/>
+            <column name="color" value="#C2FF00"/>
+            <column name="radius" valueNumeric="153"/>
+            <column name="radius_angstrom" valueNumeric="0.90"/>
+            <column name="group_number" valueNumeric="2"/>
+            <column name="period" valueNumeric="2"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="alkaline_earth"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="B"/>
+            <column name="name" value="Boron"/>
+            <column name="name_ru" value="Бор"/>
+            <column name="atomic_number" valueNumeric="5"/>
+            <column name="atomic_mass" valueNumeric="10.811"/>
+            <column name="color" value="#FFB5B5"/>
+            <column name="radius" valueNumeric="192"/>
+            <column name="radius_angstrom" valueNumeric="0.82"/>
+            <column name="group_number" valueNumeric="13"/>
+            <column name="period" valueNumeric="2"/>
+            <column name="valence" valueNumeric="3"/>
+            <column name="category" value="metalloid"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="F"/>
+            <column name="name" value="Fluorine"/>
+            <column name="name_ru" value="Фтор"/>
+            <column name="atomic_number" valueNumeric="9"/>
+            <column name="atomic_mass" valueNumeric="18.998"/>
+            <column name="color" value="#90E050"/>
+            <column name="radius" valueNumeric="147"/>
+            <column name="radius_angstrom" valueNumeric="0.71"/>
+            <column name="group_number" valueNumeric="17"/>
+            <column name="period" valueNumeric="2"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="halogen"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Ne"/>
+            <column name="name" value="Neon"/>
+            <column name="name_ru" value="Неон"/>
+            <column name="atomic_number" valueNumeric="10"/>
+            <column name="atomic_mass" valueNumeric="20.180"/>
+            <column name="color" value="#B3E3F5"/>
+            <column name="radius" valueNumeric="154"/>
+            <column name="radius_angstrom" valueNumeric="0.69"/>
+            <column name="group_number" valueNumeric="18"/>
+            <column name="period" valueNumeric="2"/>
+            <column name="category" value="noble_gas"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Na"/>
+            <column name="name" value="Sodium"/>
+            <column name="name_ru" value="Натрий"/>
+            <column name="atomic_number" valueNumeric="11"/>
+            <column name="atomic_mass" valueNumeric="22.990"/>
+            <column name="color" value="#AB5CF2"/>
+            <column name="radius" valueNumeric="227"/>
+            <column name="radius_angstrom" valueNumeric="1.54"/>
+            <column name="group_number" valueNumeric="1"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="alkali_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Mg"/>
+            <column name="name" value="Magnesium"/>
+            <column name="name_ru" value="Магний"/>
+            <column name="atomic_number" valueNumeric="12"/>
+            <column name="atomic_mass" valueNumeric="24.305"/>
+            <column name="color" value="#8AFF00"/>
+            <column name="radius" valueNumeric="173"/>
+            <column name="radius_angstrom" valueNumeric="1.30"/>
+            <column name="group_number" valueNumeric="2"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="alkaline_earth"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Al"/>
+            <column name="name" value="Aluminium"/>
+            <column name="name_ru" value="Алюминий"/>
+            <column name="atomic_number" valueNumeric="13"/>
+            <column name="atomic_mass" valueNumeric="26.982"/>
+            <column name="color" value="#BFA6A6"/>
+            <column name="radius" valueNumeric="184"/>
+            <column name="radius_angstrom" valueNumeric="1.18"/>
+            <column name="group_number" valueNumeric="13"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="valence" valueNumeric="3"/>
+            <column name="category" value="post_transition"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Si"/>
+            <column name="name" value="Silicon"/>
+            <column name="name_ru" value="Кремний"/>
+            <column name="atomic_number" valueNumeric="14"/>
+            <column name="atomic_mass" valueNumeric="28.086"/>
+            <column name="color" value="#F0C8A0"/>
+            <column name="radius" valueNumeric="210"/>
+            <column name="radius_angstrom" valueNumeric="1.11"/>
+            <column name="group_number" valueNumeric="14"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="valence" valueNumeric="4"/>
+            <column name="category" value="metalloid"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="P"/>
+            <column name="name" value="Phosphorus"/>
+            <column name="name_ru" value="Фосфор"/>
+            <column name="atomic_number" valueNumeric="15"/>
+            <column name="atomic_mass" valueNumeric="30.974"/>
+            <column name="color" value="#FF8000"/>
+            <column name="radius" valueNumeric="180"/>
+            <column name="radius_angstrom" valueNumeric="1.06"/>
+            <column name="group_number" valueNumeric="15"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="valence" valueNumeric="5"/>
+            <column name="category" value="nonmetal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="S"/>
+            <column name="name" value="Sulfur"/>
+            <column name="name_ru" value="Сера"/>
+            <column name="atomic_number" valueNumeric="16"/>
+            <column name="atomic_mass" valueNumeric="32.065"/>
+            <column name="color" value="#FFFF30"/>
+            <column name="radius" valueNumeric="180"/>
+            <column name="radius_angstrom" valueNumeric="1.02"/>
+            <column name="group_number" valueNumeric="16"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="nonmetal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Cl"/>
+            <column name="name" value="Chlorine"/>
+            <column name="name_ru" value="Хлор"/>
+            <column name="atomic_number" valueNumeric="17"/>
+            <column name="atomic_mass" valueNumeric="35.453"/>
+            <column name="color" value="#1FF01F"/>
+            <column name="radius" valueNumeric="175"/>
+            <column name="radius_angstrom" valueNumeric="0.99"/>
+            <column name="group_number" valueNumeric="17"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="halogen"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Ar"/>
+            <column name="name" value="Argon"/>
+            <column name="name_ru" value="Аргон"/>
+            <column name="atomic_number" valueNumeric="18"/>
+            <column name="atomic_mass" valueNumeric="39.948"/>
+            <column name="color" value="#80D1E3"/>
+            <column name="radius" valueNumeric="188"/>
+            <column name="radius_angstrom" valueNumeric="0.97"/>
+            <column name="group_number" valueNumeric="18"/>
+            <column name="period" valueNumeric="3"/>
+            <column name="category" value="noble_gas"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="K"/>
+            <column name="name" value="Potassium"/>
+            <column name="name_ru" value="Калий"/>
+            <column name="atomic_number" valueNumeric="19"/>
+            <column name="atomic_mass" valueNumeric="39.098"/>
+            <column name="color" value="#8F40D4"/>
+            <column name="radius" valueNumeric="275"/>
+            <column name="radius_angstrom" valueNumeric="1.96"/>
+            <column name="group_number" valueNumeric="1"/>
+            <column name="period" valueNumeric="4"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="alkali_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Ca"/>
+            <column name="name" value="Calcium"/>
+            <column name="name_ru" value="Кальций"/>
+            <column name="atomic_number" valueNumeric="20"/>
+            <column name="atomic_mass" valueNumeric="40.078"/>
+            <column name="color" value="#3DFF00"/>
+            <column name="radius" valueNumeric="231"/>
+            <column name="radius_angstrom" valueNumeric="1.74"/>
+            <column name="group_number" valueNumeric="2"/>
+            <column name="period" valueNumeric="4"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="alkaline_earth"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Fe"/>
+            <column name="name" value="Iron"/>
+            <column name="name_ru" value="Железо"/>
+            <column name="atomic_number" valueNumeric="26"/>
+            <column name="atomic_mass" valueNumeric="55.845"/>
+            <column name="color" value="#E06633"/>
+            <column name="radius" valueNumeric="194"/>
+            <column name="radius_angstrom" valueNumeric="1.17"/>
+            <column name="group_number" valueNumeric="8"/>
+            <column name="period" valueNumeric="4"/>
+            <column name="valence" valueNumeric="3"/>
+            <column name="category" value="transition_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Cu"/>
+            <column name="name" value="Copper"/>
+            <column name="name_ru" value="Медь"/>
+            <column name="atomic_number" valueNumeric="29"/>
+            <column name="atomic_mass" valueNumeric="63.546"/>
+            <column name="color" value="#C78033"/>
+            <column name="radius" valueNumeric="196"/>
+            <column name="radius_angstrom" valueNumeric="1.17"/>
+            <column name="group_number" valueNumeric="11"/>
+            <column name="period" valueNumeric="4"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="transition_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Zn"/>
+            <column name="name" value="Zinc"/>
+            <column name="name_ru" value="Цинк"/>
+            <column name="atomic_number" valueNumeric="30"/>
+            <column name="atomic_mass" valueNumeric="65.380"/>
+            <column name="color" value="#7D80B0"/>
+            <column name="radius" valueNumeric="201"/>
+            <column name="radius_angstrom" valueNumeric="1.20"/>
+            <column name="group_number" valueNumeric="12"/>
+            <column name="period" valueNumeric="4"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="transition_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Br"/>
+            <column name="name" value="Bromine"/>
+            <column name="name_ru" value="Бром"/>
+            <column name="atomic_number" valueNumeric="35"/>
+            <column name="atomic_mass" valueNumeric="79.904"/>
+            <column name="color" value="#A62929"/>
+            <column name="radius" valueNumeric="185"/>
+            <column name="radius_angstrom" valueNumeric="1.14"/>
+            <column name="group_number" valueNumeric="17"/>
+            <column name="period" valueNumeric="4"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="halogen"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Ag"/>
+            <column name="name" value="Silver"/>
+            <column name="name_ru" value="Серебро"/>
+            <column name="atomic_number" valueNumeric="47"/>
+            <column name="atomic_mass" valueNumeric="107.868"/>
+            <column name="color" value="#C0C0C0"/>
+            <column name="radius" valueNumeric="203"/>
+            <column name="radius_angstrom" valueNumeric="1.34"/>
+            <column name="group_number" valueNumeric="11"/>
+            <column name="period" valueNumeric="5"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="transition_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Sn"/>
+            <column name="name" value="Tin"/>
+            <column name="name_ru" value="Олово"/>
+            <column name="atomic_number" valueNumeric="50"/>
+            <column name="atomic_mass" valueNumeric="118.710"/>
+            <column name="color" value="#668080"/>
+            <column name="radius" valueNumeric="217"/>
+            <column name="radius_angstrom" valueNumeric="1.41"/>
+            <column name="group_number" valueNumeric="14"/>
+            <column name="period" valueNumeric="5"/>
+            <column name="valence" valueNumeric="4"/>
+            <column name="category" value="post_transition"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="I"/>
+            <column name="name" value="Iodine"/>
+            <column name="name_ru" value="Иод"/>
+            <column name="atomic_number" valueNumeric="53"/>
+            <column name="atomic_mass" valueNumeric="126.904"/>
+            <column name="color" value="#940094"/>
+            <column name="radius" valueNumeric="198"/>
+            <column name="radius_angstrom" valueNumeric="1.33"/>
+            <column name="group_number" valueNumeric="17"/>
+            <column name="period" valueNumeric="5"/>
+            <column name="valence" valueNumeric="1"/>
+            <column name="category" value="halogen"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Ba"/>
+            <column name="name" value="Barium"/>
+            <column name="name_ru" value="Барий"/>
+            <column name="atomic_number" valueNumeric="56"/>
+            <column name="atomic_mass" valueNumeric="137.327"/>
+            <column name="color" value="#00C900"/>
+            <column name="radius" valueNumeric="253"/>
+            <column name="radius_angstrom" valueNumeric="1.98"/>
+            <column name="group_number" valueNumeric="2"/>
+            <column name="period" valueNumeric="6"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="alkaline_earth"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Hg"/>
+            <column name="name" value="Mercury"/>
+            <column name="name_ru" value="Ртуть"/>
+            <column name="atomic_number" valueNumeric="80"/>
+            <column name="atomic_mass" valueNumeric="200.590"/>
+            <column name="color" value="#B8B8D0"/>
+            <column name="radius" valueNumeric="209"/>
+            <column name="radius_angstrom" valueNumeric="1.49"/>
+            <column name="group_number" valueNumeric="12"/>
+            <column name="period" valueNumeric="6"/>
+            <column name="valence" valueNumeric="2"/>
+            <column name="category" value="transition_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Au"/>
+            <column name="name" value="Gold"/>
+            <column name="name_ru" value="Золото"/>
+            <column name="atomic_number" valueNumeric="79"/>
+            <column name="atomic_mass" valueNumeric="196.967"/>
+            <column name="color" value="#FFD123"/>
+            <column name="radius" valueNumeric="214"/>
+            <column name="radius_angstrom" valueNumeric="1.44"/>
+            <column name="group_number" valueNumeric="11"/>
+            <column name="period" valueNumeric="6"/>
+            <column name="valence" valueNumeric="3"/>
+            <column name="category" value="transition_metal"/>
+        </insert>
+        <insert tableName="periodic_table">
+            <column name="symbol" value="Pb"/>
+            <column name="name" value="Lead"/>
+            <column name="name_ru" value="Свинец"/>
+            <column name="atomic_number" valueNumeric="82"/>
+            <column name="atomic_mass" valueNumeric="207.200"/>
+            <column name="color" value="#575961"/>
+            <column name="radius" valueNumeric="202"/>
+            <column name="radius_angstrom" valueNumeric="1.47"/>
+            <column name="group_number" valueNumeric="14"/>
+            <column name="period" valueNumeric="6"/>
+            <column name="valence" valueNumeric="4"/>
+            <column name="category" value="post_transition"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

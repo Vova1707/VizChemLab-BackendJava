@@ -6,6 +6,7 @@
        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
     <include file="db.changelog/1.0/2026-05-03-auth-tables.xml"/>
     <include file="db.changelog/1.0/2026-05-03-vizualizer-tables.xml"/>
+    <include file="db.changelog/1.0/2026-05-20-chemical-elements-update.xml"/>
     <include file="db.changelog/data/2026-05-03-user-data.xml"/>
     <include file="db.changelog/data/2026-05-03-visualizer-data.xml"/>
 </databaseChangeLog>

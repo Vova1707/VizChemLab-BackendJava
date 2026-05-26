@@ -43,7 +43,9 @@ public class PubChemService {
                 .retrieve()
                 .body(String.class);
             JsonNode root = objectMapper.readTree(response);
+
             JsonNode firstBlock = root.get(0);
+
             if (firstBlock != null && firstBlock.isArray()) {
                 StringBuilder sb = new StringBuilder();
                 for (JsonNode segment : firstBlock) {
@@ -208,7 +210,9 @@ public class PubChemService {
     }
 
     private boolean isValidSdf(String sdf) {
-        return sdf != null && sdf.trim().length() > 50;
+        if (sdf == null || sdf.trim().length() < 50) return false;
+        if (sdf.contains("Status: 4") || sdf.contains("PUGREST.")) return false;
+        return sdf.contains("M  END") || sdf.contains("$$$$") || sdf.contains("V2000") || sdf.contains("V3000");
     }
 
     private String encode(String value) {
