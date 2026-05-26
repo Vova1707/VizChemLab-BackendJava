@@ -6,6 +6,9 @@
        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet id="2026-05-03-insert-extended-periodic-table" author="kondrahin">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM periodic_table WHERE symbol = 'Na'</sqlCheck>
+        </preConditions>
         <loadData
             file="db.changelog/data/csv/periodic_table_extended.csv"
             tableName="periodic_table"
